@@ -15,6 +15,3 @@ jobs:
 
       - name: Build docker image
         run: docker build . -t $IMAGE_NAME
-
-      - name: Build
-        run: docker run --rm $IMAGE_NAME npm run build

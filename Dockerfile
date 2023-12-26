@@ -1,4 +1,4 @@
-FROM node:18-alpine as BUILD_IMAGE
+FROM node:18-alpine as builder
 
 WORKDIR /app/client
 COPY package.json .
@@ -7,10 +7,10 @@ COPY . .
 
 RUN npm run build
 
-FROM node:18-alpine as PRODUCTION_IMAGE
+FROM node:18-alpine
 
 WORKDIR /app/client
-COPY --from=BUILD_IMAGE /app/client/dist/ /app/client/dist/
+COPY --from=builder /app/client/dist/ /app/client/dist/
 
 COPY package.json .
 COPY vite.config.ts .
