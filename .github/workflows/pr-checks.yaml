@@ -1,0 +1,31 @@
+name: PR-checks
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3.3.0
+        with:
+          path: node_modules
+          key: |
+            ${{ runner.os }}-lock-${{ hashFiles('**/package-lock.json') }}
+            ${{ runner.os }}-package-${{ hashFiles('**/package.json') }}
+
+      - name: Install npm Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
