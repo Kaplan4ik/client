@@ -1,21 +1,19 @@
-FROM node:18-alpine as builder
+FROM node:17-alpine AS builder
 
-WORKDIR /app/client
+WORKDIR /app
+
 COPY package.json .
+
 RUN npm install
+
 COPY . .
 
 RUN npm run build
 
-FROM node:18-alpine
+FROM nginx:1.21.0-alpine
 
-WORKDIR /app/client
-COPY --from=builder /app/client/dist/ /app/client/dist/
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-COPY package.json .
-COPY vite.config.ts .
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-RUN npm install typescript
-EXPOSE 8080
-
-CMD ["npm", "run", "preview"]
+CMD ["nginx", "-g", "daemon off;"]
